@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Calcolatrice</title>
+    </head>
+    <style>
+        #b {
+            height: 25px;
+            width: 25px;
+        }
+        #num {
+            display: grid;
+            grid-template-columns: repeat(3,35px);
+            grid-template-rows: repeat(3,35px);
+        }
+        #op {
+            display: grid;
+            grid-template-columns: repeat(2,35px);
+            grid-template-rows: repeat(2,35px);            
+        }
+        #container {
+            display: grid;
+            grid-template-columns: repeat(2,105px);
+        }
+    </style>
+    <body>
+        <div>
+        <div>
+            <input type="text" disabled placeholder="0" id="calc">
+        </div>
+        <br>
+        <div id="container">
+        <div id="num">
+            <input type="button" value="7" id="b" name="7" onclick="aggiungi(7)">
+            <input type="button" value="8" id="b" name="8" onclick="aggiungi(8)">
+            <input type="button" value="9" id="b" name="9" onclick="aggiungi(9)">
+            <input type="button" value="4" id="b" name="4" onclick="aggiungi(4)">
+            <input type="button" value="5" id="b" name="5" onclick="aggiungi(5)">
+            <input type="button" value="6" id="b" name="6" onclick="aggiungi(6)">
+            <input type="button" value="1" id="b" name="1" onclick="aggiungi(1)">
+            <input type="button" value="2" id="b" name="2" onclick="aggiungi(2)">
+            <input type="button" value="3" id="b" name="3" onclick="aggiungi(3)">
+        </div>
+        <div id="op">
+            <input type="button" value="x" id="b" name="x" onclick="aggiungi('x')">
+            <input type="button" value="/" id="b" name="/" onclick="aggiungi('/')">
+            <input type="button" value="+" id="b" name="+" onclick="aggiungi('+')">
+            <input type="button" value="-" id="b" name="-" onclick="aggiungi('-')">
+            <input type="button" value="=" id="b" name="=" onclick="calcola()">
+        </div>
+        </div>
+        </div>
+        <script>
+            let buffer = []
+            let parsed = []
+            let risultato = 0
+            let mostra = ""
+
+            function aggiungi(a) {
+                buffer.push(a)
+                console.log(buffer)
+                if (["+","-","x","/"].includes(a)) {
+                    mostra = ""
+                } else {
+                    mostra += a.toString()
+                }
+                document.getElementById("calc").value = mostra
+            }
+
+            function parseBuffer() {
+                let n = ""
+                for(i=0;i<buffer.length;i++) {
+                    if (!["+","-","x","/"].includes(buffer[i])) {
+                        n += buffer[i].toString()
+                        if (i==buffer.length-1) {
+                            parsed.push(parseInt(n))
+                        }
+                    } else {
+                        parsed.push(parseInt(n))
+                        n=""
+                        parsed.push(buffer[i])                        
+                    }
+                }
+                console.log(parsed)
+            }
+
+            function priorita() {
+                for (let i = 0; i < parsed.length; i++) {
+                    if (parsed[i] === "x" || parsed[i] === "/") {
+                        let n;
+                        if (parsed[i] === "x") {
+                            n = parsed[i - 1] * parsed[i + 1];
+                        } else {
+                            n = parsed[i - 1] / parsed[i + 1];
+                        }
+                        parsed.splice(i - 1, 3, n);
+                        i -= 2;
+                    }
+                }
+                console.log(parsed);
+            }
+
+            function calcola() {
+                parseBuffer()
+                priorita()
+                for(i=0;i<parsed.length;i++) {
+                    switch (parsed[i]) {
+                        case "+":
+                            risultato += parsed[i+1]
+                            i++
+                            break
+                        case "-":
+                            risultato -= parsed[i+1]
+                            i++
+                            break
+                        case "x": 
+                            risultato *= parsed[i+1]
+                            i++
+                            break
+                        case "/":
+                            risultato /= parsed[i+1]
+                            i++
+                            break
+                        default:
+                            risultato = parsed[i]
+                            break
+                    }
+                }
+                console.log(risultato)
+                document.getElementById("calc").value = risultato
+                buffer = []
+                parsed = []
+                risultato = 0
+                mostra = ""
+            }
+        </script>
+    </body>
+</html>
